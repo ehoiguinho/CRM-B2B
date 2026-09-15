@@ -1,8 +1,8 @@
 {
   "version": 2,
-  "dgSpecHash": "BurWNnNZkC0=",
+  "dgSpecHash": "h0HUbhaL5Wk=",
   "success": true,
-  "projectFilePath": "/Users/oi/Documents/pr-csharp/intro-csharp/crudUsuarios/crudUsuarios.csproj",
+  "projectFilePath": "/Users/oi/Documents/GitHub/intro-csharp/crudUsuarios/crudUsuarios.csproj",
   "expectedPackageFiles": [
     "/Users/oi/.nuget/packages/humanizer.core/2.14.1/humanizer.core.2.14.1.nupkg.sha512",
     "/Users/oi/.nuget/packages/microsoft.aspnetcore.openapi/10.0.12/microsoft.aspnetcore.openapi.10.0.12.nupkg.sha512",

@@ -2212,11 +2212,11 @@
   "project": {
     "version": "1.0.0",
     "restore": {
-      "projectUniqueName": "/Users/oi/Documents/pr-csharp/intro-csharp/crudUsuarios/crudUsuarios.csproj",
+      "projectUniqueName": "/Users/oi/Documents/GitHub/intro-csharp/crudUsuarios/crudUsuarios.csproj",
       "projectName": "crudUsuarios",
-      "projectPath": "/Users/oi/Documents/pr-csharp/intro-csharp/crudUsuarios/crudUsuarios.csproj",
+      "projectPath": "/Users/oi/Documents/GitHub/intro-csharp/crudUsuarios/crudUsuarios.csproj",
       "packagesPath": "/Users/oi/.nuget/packages/",
-      "outputPath": "/Users/oi/Documents/pr-csharp/intro-csharp/crudUsuarios/obj/",
+      "outputPath": "/Users/oi/Documents/GitHub/intro-csharp/crudUsuarios/obj/",
       "projectStyle": "PackageReference",
       "configFilePaths": [
         "/Users/oi/.nuget/NuGet/NuGet.Config"
