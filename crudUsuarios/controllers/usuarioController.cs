@@ -29,7 +29,7 @@ public class UsuarioController : ControllerBase
         }
             return Ok(usuario);
     }
-    
+
     [HttpPost]
     public async Task <IActionResult> PostUsuario(UsuarioRequest usuarioRequest)
     {
@@ -40,16 +40,16 @@ public class UsuarioController : ControllerBase
     }
 
     [HttpPut("{id}")]
-    public async Task <IActionResult> PutUsuario(int id, Usuario usuario)
+    public async Task <IActionResult> PutUsuario(int id, UsuarioRequest usuarioRequest)
     {
-        var usuarioAlterado = await _usuarioService.PutUsuario(id, usuario);
+        var usuarioAlterado = await _usuarioService.PutUsuario(id, usuarioRequest);
        
        if(usuarioAlterado == null)
         {
         return NotFound();
 
         }
-        return Ok(usuario);
+        return Ok(usuarioAlterado);
 
     }
 
@@ -57,12 +57,12 @@ public class UsuarioController : ControllerBase
     public async Task<IActionResult> DeleteUsuario(int id)
     {
         var usuarioExistente = await _usuarioService.DeleteUsuario(id);
-        if(usuarioExistente == null)
+        if(usuarioExistente == false)
         {
             return NotFound();
         }
 
-        return Ok(usuarioExistente);
+        return NoContent();
     }
 
     

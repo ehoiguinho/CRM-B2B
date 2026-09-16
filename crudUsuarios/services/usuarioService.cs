@@ -68,7 +68,7 @@ public class UsuarioService{
         return response;
         
     }
-    public async Task <Usuario?>PutUsuario(int id, Usuario usuario)
+    public async Task <UsuarioResponse?>PutUsuario(int id, UsuarioRequest usuarioRequest)
     {
         var usuarioExistente = await _context.Usuarios.FirstOrDefaultAsync(u => u.Id == id);
         
@@ -77,28 +77,36 @@ public class UsuarioService{
             return null;
         }
 
-        usuarioExistente.Nome = usuario.Nome;
-        usuarioExistente.Email = usuario.Email;
-        usuarioExistente.Senha = usuario.Senha;
-        usuarioExistente.Telefone = usuario.Telefone;
+        usuarioExistente.Nome = usuarioRequest.Nome;
+        usuarioExistente.Email = usuarioRequest.Email;
+        usuarioExistente.Senha = usuarioRequest.Senha;
+        usuarioExistente.Telefone = usuarioRequest.Telefone;
 
         await _context.SaveChangesAsync();
 
-        return usuarioExistente;
+        var response = new UsuarioResponse
+        {
+            Id = usuarioExistente.Id,
+            Nome = usuarioExistente.Nome,
+            Email = usuarioExistente.Email,
+            Telefone = usuarioExistente.Telefone
+        };
+
+        return response;
     }
-    public async Task <Usuario?>DeleteUsuario(int id)
+    public async Task <bool>DeleteUsuario(int id)
     {
         var usuarioExistente = await _context.Usuarios.FirstOrDefaultAsync(u => u.Id == id);
         if(usuarioExistente == null)
         {
-            return null;
+            return false;
+            
         }
-
+       
         _context.Usuarios.Remove(usuarioExistente);
-
         await _context.SaveChangesAsync();
 
-        return usuarioExistente;
+        return true;
         
     }
 
