@@ -29,14 +29,16 @@ public class UsuarioController : ControllerBase
         }
             return Ok(usuario);
     }
+    
     [HttpPost]
-    public async Task <IActionResult> PostUsuario(Usuario usuario)
+    public async Task <IActionResult> PostUsuario(UsuarioRequest usuarioRequest)
     {
-        await _usuarioService.PostUsuario(usuario);
+       var usuario = await _usuarioService.PostUsuario(usuarioRequest);
 
         return CreatedAtAction("GetUsuario", new { id = usuario.Id}, usuario);
         
     }
+
     [HttpPut("{id}")]
     public async Task <IActionResult> PutUsuario(int id, Usuario usuario)
     {
@@ -50,6 +52,7 @@ public class UsuarioController : ControllerBase
         return Ok(usuario);
 
     }
+
     [HttpDelete("{id}")]
     public async Task<IActionResult> DeleteUsuario(int id)
     {
