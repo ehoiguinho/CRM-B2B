@@ -42,6 +42,7 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<UsuarioLogadoService>();
+builder.Services.AddScoped<ClienteService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen(options =>
