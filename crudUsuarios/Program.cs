@@ -13,11 +13,16 @@ builder.Services.AddDbContext<AppDbContext>(options =>
 );
 
 builder.Services.AddScoped<UsuarioService>();
+builder.Services.AddScoped<JwtService>();
 builder.Services.AddOpenApi();
+builder.Services.AddSwaggerGen();
 builder.Services.AddControllers();
 
 var app = builder.Build();
 
+app.UseSwagger();
+app.UseSwaggerUI();
+app.UseMiddleware<ExceptionMiddleware>();
 app.MapControllers();
 
 

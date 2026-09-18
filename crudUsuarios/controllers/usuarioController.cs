@@ -1,5 +1,7 @@
+using System.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.VisualBasic;
 
 [ApiController]
 [Route("usuarios")]
@@ -7,14 +9,25 @@ using Microsoft.EntityFrameworkCore;
 public class UsuarioController : ControllerBase
 {   
     private readonly UsuarioService _usuarioService;
-    public UsuarioController(UsuarioService usuarioService)
+    private readonly JwtService _jwtService;
+    public UsuarioController(UsuarioService usuarioService, JwtService jwtService)
     {
-        _usuarioService = usuarioService;        
+        _usuarioService = usuarioService;      
+        _jwtService = jwtService;  
     }
+
     [HttpGet]
     public async Task <IActionResult> GetUsuarios()
     {
         var usuarios = await _usuarioService.GetUsuarios();
+
+        if(usuarios.Count == 0)
+        {
+            return NotFound(new
+            {
+                Mensagem = "Nenhum usuário encontrado."
+            });
+        }
 
         return Ok(usuarios);
     }
@@ -25,7 +38,10 @@ public class UsuarioController : ControllerBase
             var usuario = await _usuarioService.GetUsuarioId(id);
         if(usuario == null)
         {
-            return NotFound();
+            return NotFound(new
+            {
+                mensagem = "Usuário não encontrado."
+            });
         }
             return Ok(usuario);
     }
@@ -35,7 +51,10 @@ public class UsuarioController : ControllerBase
     {
        var usuario = await _usuarioService.PostUsuario(usuarioRequest);
 
-        return CreatedAtAction("GetUsuario", new { id = usuario.Id}, usuario);
+        return CreatedAtAction("GetUsuario", new { id = usuario.Id }, new
+        {
+            mensagem = "Usuario cadastrado com sucesso.", usuario
+        });
         
     }
 
@@ -46,10 +65,14 @@ public class UsuarioController : ControllerBase
        
        if(usuarioAlterado == null)
         {
-        return NotFound();
+        return NotFound(new
+        {
+            mensagem = "Usuário não encontrado."
+        });
 
         }
         return Ok(usuarioAlterado);
+
 
     }
 
@@ -59,10 +82,44 @@ public class UsuarioController : ControllerBase
         var usuarioExistente = await _usuarioService.DeleteUsuario(id);
         if(usuarioExistente == false)
         {
-            return NotFound();
+            return NotFound(new
+            {
+                mensagem = "Usuário não encontrado."
+            });
         }
 
-        return NoContent();
+        return Ok(new
+        {
+            mensagem = "Usuário deletado com sucesso!"
+        });
+    }
+    [HttpPost("login")]
+    public async Task<IActionResult> Login(LoginRequest loginRequest)
+    {
+        var usuario = await _usuarioService.Login(loginRequest);
+
+        if(usuario == null)
+        {
+            return Unauthorized(new
+            {
+                mensagem = "E-mail ou senha inválidos."
+            });
+        }
+
+        var token = _jwtService.GerarToken(new Usuario());
+
+        return Ok(new
+        {
+            mensagem = "Login realizado com sucesso.",
+            token,
+            usuario = new UsuarioResponse
+            {
+                Id = usuario.Id,
+                Nome = usuario.Nome,
+                Email = usuario.Email,
+                Telefone = usuario.Telefone
+            }
+        });
     }
 
     

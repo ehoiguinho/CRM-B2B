@@ -46,15 +46,22 @@ public class UsuarioService{
     public async Task <UsuarioResponse>PostUsuario(UsuarioRequest usuarioRequest)
     {
 
+        var emailExiste = await _context.Usuarios.AnyAsync(u => u.Email == usuarioRequest.Email);
+        if (emailExiste)
+        {
+            throw new BusinessException("Esse E-mail já foi cadastrado.", 409);
+        }
+
         var usuario = new Usuario
         {
             Nome = usuarioRequest.Nome,
             Email = usuarioRequest.Email,
-            Senha = usuarioRequest.Senha,
+            Senha = BCrypt.Net.BCrypt.HashPassword(usuarioRequest.Senha),
             Telefone = usuarioRequest.Telefone
         };
 
         await _context.Usuarios.AddAsync(usuario);
+
         await _context.SaveChangesAsync();
 
         var response = new UsuarioResponse  
@@ -66,11 +73,15 @@ public class UsuarioService{
         };
 
         return response;
-        
     }
     public async Task <UsuarioResponse?>PutUsuario(int id, UsuarioRequest usuarioRequest)
     {
-        var usuarioExistente = await _context.Usuarios.FirstOrDefaultAsync(u => u.Id == id);
+        var emailExiste = await _context.Usuarios.AnyAsync(u => u.Email == usuarioRequest.Email && u.Id == id);
+        if(emailExiste)
+        {
+            throw new BusinessException("E-mail já cadastrado.", 409);
+        }
+        var usuarioExistente = await _context.Usuarios.FirstOrDefaultAsync(u => u.Id != id);
         
         if (usuarioExistente == null)
         {
@@ -79,7 +90,7 @@ public class UsuarioService{
 
         usuarioExistente.Nome = usuarioRequest.Nome;
         usuarioExistente.Email = usuarioRequest.Email;
-        usuarioExistente.Senha = usuarioRequest.Senha;
+        usuarioExistente.Senha = BCrypt.Net.BCrypt.HashPassword(usuarioRequest.Senha);
         usuarioExistente.Telefone = usuarioRequest.Telefone;
 
         await _context.SaveChangesAsync();
@@ -108,6 +119,24 @@ public class UsuarioService{
 
         return true;
         
+    }
+
+    public async Task <Usuario?>Login(LoginRequest loginRequest)
+    {
+        var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Email == loginRequest.Email);
+        if (usuario == null)
+        {
+            return null;
+        }
+
+        var senhaValida = BCrypt.Net.BCrypt.Verify(loginRequest.Senha, usuario.Senha);
+
+        if (!senhaValida)
+        {
+            return null;
+        }
+
+        return usuario;
     }
 
 }
