@@ -33,5 +33,9 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Usuario>()
             .Property(u => u.Telefone)
             .HasColumnName("telefone");
-    }
+        
+        modelBuilder.Entity<Usuario>()
+            .Property(u => u.Perfil)
+            .HasColumnName("perfil");    
+        }
 }

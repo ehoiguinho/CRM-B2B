@@ -1,7 +1,9 @@
 using System.Diagnostics;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.VisualBasic;
+using System.Security.Claims;
 
 [ApiController]
 [Route("usuarios")]
@@ -10,13 +12,15 @@ public class UsuarioController : ControllerBase
 {   
     private readonly UsuarioService _usuarioService;
     private readonly JwtService _jwtService;
-    public UsuarioController(UsuarioService usuarioService, JwtService jwtService)
+    private readonly UsuarioLogadoService _usuarioLogadoService;
+    public UsuarioController(UsuarioService usuarioService, JwtService jwtService, UsuarioLogadoService usuarioLogadoService)
     {
         _usuarioService = usuarioService;      
         _jwtService = jwtService;  
+        _usuarioLogadoService = usuarioLogadoService;
     }
 
-    [HttpGet]
+    [HttpGet][Authorize]
     public async Task <IActionResult> GetUsuarios()
     {
         var usuarios = await _usuarioService.GetUsuarios();
@@ -106,7 +110,7 @@ public class UsuarioController : ControllerBase
             });
         }
 
-        var token = _jwtService.GerarToken(new Usuario());
+        var token = _jwtService.GerarToken(usuario);
 
         return Ok(new
         {
@@ -121,7 +125,32 @@ public class UsuarioController : ControllerBase
             }
         });
     }
+    [HttpGet("me")][Authorize]
+    public async Task<IActionResult> GetUsuarioLogado()
+    {
+        var usuarioId = _usuarioLogadoService.GetUsuarioId();
+         
+        var usuario = await _usuarioService.GetUsuarioId(usuarioId);
 
+        if(usuario == null)
+        {
+            return NotFound(new
+            {
+                mensagem = "Usuário não encontrado."
+            });
+        }
+        return Ok(usuario);
+    }
+
+    [Authorize(Roles = "ADMIN")]
+    [HttpGet("admin")]
+    public IActionResult AreaAdmin()
+    {
+        return Ok(new
+        {
+            mensagem = "Você possui acesso de administrador."
+        });
+    }
     
 
 
