@@ -1,7 +1,8 @@
 
 
 public class Cliente
-{
+{   
+    public ICollection<Contato> Contatos { get; set; } = new List<Contato>();
     public int Id {get; set;} 
     public string RazaoSocial {get; set;} = string.Empty;
     public string NomeFantasia {get; set;} = string.Empty;

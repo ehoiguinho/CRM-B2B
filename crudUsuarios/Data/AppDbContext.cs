@@ -9,6 +9,7 @@ public class AppDbContext : DbContext
 
     public DbSet<Usuario> Usuarios { get; set; } = null!;
     public DbSet<Cliente> Clientes { get; set;} = null!;
+    public DbSet<Contato> Contatos {get; set; } = null!;
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Usuario>()
@@ -75,5 +76,43 @@ public class AppDbContext : DbContext
             .HasColumnName("criado_em")
             .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<Contato>()
+            .ToTable("tb_contato");
+
+        modelBuilder.Entity<Contato>()
+            .HasOne(c => c.Cliente)
+            .WithMany(c => c.Contatos)
+            .HasForeignKey(c => c.ClienteId);
+
+        modelBuilder.Entity<Contato>()
+            .Property(c => c.Id)
+            .HasColumnName("id");
+
+        modelBuilder.Entity<Contato>()
+            .Property(c => c.ClienteId)
+            .HasColumnName("cliente_id");
+
+        modelBuilder.Entity<Contato>()
+            .Property(c => c.Nome)
+            .HasColumnName("nome");
+
+        modelBuilder.Entity<Contato>()
+            .Property(c => c.Email)
+            .HasColumnName("email");
+
+        modelBuilder.Entity<Contato>()
+            .Property(c => c.Telefone)
+            .HasColumnName("telefone");
+
+        modelBuilder.Entity<Contato>()
+            .Property(c => c.Cargo)
+            .HasColumnName("cargo");
+            
+        modelBuilder.Entity<Contato>()
+            .Property(c => c.CriadoEm)
+            .HasColumnName("criado_em");
+        
     }
+
 }
