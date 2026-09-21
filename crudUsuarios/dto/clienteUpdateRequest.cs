@@ -3,11 +3,11 @@ using System.ComponentModel.DataAnnotations;
 public class ClienteUpdateRequest
 {
     [Required]
-    [StringLength(30, MinimumLength = 10)]
+    [StringLength(30)]
     public string RazaoSocial { get; set; } = string.Empty;
 
     [Required]
-    [StringLength(30, MinimumLength = 10)]
+    [StringLength(30)]
     public string NomeFantasia { get; set; } = string.Empty;
 
     [Required]

@@ -43,6 +43,7 @@ builder.Services.AddScoped<UsuarioService>();
 builder.Services.AddScoped<JwtService>();
 builder.Services.AddScoped<UsuarioLogadoService>();
 builder.Services.AddScoped<ClienteService>();
+builder.Services.AddScoped<ContatoService>();
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddOpenApi();
 builder.Services.AddSwaggerGen(options =>

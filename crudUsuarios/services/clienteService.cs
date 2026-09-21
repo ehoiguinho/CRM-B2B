@@ -87,9 +87,9 @@ public class ClienteService
         return response;
         
     }
-    public async Task<ClienteResponse?> PutCliente(int id, ClienteRequest clienteRequest)
+    public async Task<ClienteResponse?> PutCliente(int id, ClienteUpdateRequest clienteRequest)
     {
-        var emailExiste = await _context.Clientes.AnyAsync(u => u.Email == clienteRequest.Email & u.Id != id);
+        var emailExiste = await _context.Clientes.AnyAsync(u => u.Email == clienteRequest.Email && u.Id != id);
         if(emailExiste)
         {
             throw new BusinessException("E-mail já cadastrado no sistema", 409);

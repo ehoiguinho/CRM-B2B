@@ -54,7 +54,7 @@ public class ClienteController : ControllerBase{
         return Ok(cliente);
     }
     [HttpPut("{id}")][Authorize(Roles = "ADMIN")]
-    public async Task<IActionResult>PutCliente(int id, ClienteRequest clienteRequest)
+    public async Task<IActionResult>PutCliente(int id, ClienteUpdateRequest clienteRequest)
     {
         var clienteAlterado = await _clienteService.PutCliente(id, clienteRequest);
         if(clienteAlterado == null){
@@ -70,7 +70,7 @@ public class ClienteController : ControllerBase{
     public async Task<IActionResult>DeleteCliente(int id)
     {
         var clienteCancelado = await _clienteService.DeleteCliente(id);
-        if(clienteCancelado == null)
+        if(clienteCancelado == false)
         {
             return NotFound(new
             {
@@ -81,7 +81,7 @@ public class ClienteController : ControllerBase{
         return Ok(new
         {
             mensagem = "Cliente cancelado com sucesso."
-            
+
         });
     }
 }
