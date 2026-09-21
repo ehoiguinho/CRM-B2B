@@ -38,4 +38,17 @@ public class LeadController : ControllerBase
             
         }
     }
+    [HttpPut("{id}")][Authorize(Roles = "ADMIN")]
+    public async Task<IActionResult>PutLead(int id, LeadUpdateRequest leadRequest)
+    {
+        var leadAlterado = await _leadService.PutLead(id, leadRequest);
+        if(leadAlterado == null)
+        {
+            return NotFound(new
+            {
+                mensagem = "Lead não encontrado para alteração."
+            });
+        }
+        return Ok(leadAlterado);
+    }
 }

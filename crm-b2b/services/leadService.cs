@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
+using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.EntityFrameworkCore;
 
 public class LeadService
@@ -59,6 +60,39 @@ public class LeadService
             CriadoEm = l.CriadoEm,
 
         }).ToList();
+
+        return response;
+    }
+
+    public async Task<LeadResponse?> PutLead(int id, LeadUpdateRequest leadRequest)
+    {
+        var leadExistente = await _context.Leads.FirstOrDefaultAsync(l => l.Id == id);
+        if(leadExistente == null)
+        {
+            return null;
+        }
+
+        leadExistente.Nome = leadRequest.Nome;
+        leadExistente.Empresa = leadRequest.Empresa;
+        leadExistente.Email = leadRequest.Email;
+        leadExistente.Telefone = leadRequest.Telefone;
+        leadExistente.Origem = leadRequest.Origem;
+        leadExistente.Observacao = leadRequest.Observacao;
+
+        await _context.SaveChangesAsync();
+
+        var response = new LeadResponse
+        {
+            Id = leadExistente.Id,
+            Nome = leadExistente.Nome,
+            Empresa = leadExistente.Empresa,
+            Email = leadExistente.Email,
+            Telefone = leadExistente.Telefone,
+            Origem = leadExistente.Origem,
+            Status = leadExistente.Status,
+            Observacao = leadExistente.Observacao,
+            CriadoEm = leadExistente.CriadoEm
+        };
 
         return response;
     }
