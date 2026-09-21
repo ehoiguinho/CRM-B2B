@@ -1,6 +1,6 @@
 using System.ComponentModel.DataAnnotations;
 
-public class LeadRequest
+public class LeadUpdateRequest
 {
     [Required]
     [StringLength(20)]
@@ -17,7 +17,7 @@ public class LeadRequest
     public string? Telefone { get; set; }
 
     [Required]
-    [StringLength(50, MinimumLength = 2)]
+    [StringLength(30, MinimumLength = 2)]
     public string Origem { get; set; } = string.Empty;
 
     public string? Observacao { get; set; }
