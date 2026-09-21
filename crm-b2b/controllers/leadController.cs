@@ -11,7 +11,7 @@ public class LeadController : ControllerBase
     {
         _leadService = leadService;
     }
-[HttpPost][Authorize(Roles = "ADMIN")]
+    [HttpPost][Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> PostLead(LeadRequest leadRequest)
         {
         var lead = await _leadService.PostLead(leadRequest);
@@ -21,6 +21,7 @@ public class LeadController : ControllerBase
         });
         
     }
+
     [HttpGet][Authorize(Roles = "ADMIN")]
     public async Task<IActionResult>GetLeads()
     {
@@ -38,6 +39,7 @@ public class LeadController : ControllerBase
             
         }
     }
+
     [HttpPut("{id}")][Authorize(Roles = "ADMIN")]
     public async Task<IActionResult>PutLead(int id, LeadUpdateRequest leadRequest)
     {
@@ -49,6 +51,40 @@ public class LeadController : ControllerBase
                 mensagem = "Lead não encontrado para alteração."
             });
         }
+
         return Ok(leadAlterado);
+    }
+
+    [HttpPatch("{id}/status")][Authorize (Roles = "ADMIN")]
+    public async Task<IActionResult>PatchStatusLead(int id, LeadStatusRequest leadRequest)
+    {
+        var statusAlterado = await _leadService.StatusLead(id, leadRequest);
+        if(statusAlterado == null)
+        {
+            return NotFound(new
+            {
+                mensagem = "Lead nao encontrado para alteração de status."
+            });
+        }
+
+        return Ok(statusAlterado);
+    }
+    [HttpDelete("{id}")][Authorize(Roles = "ADMIN")]
+    public async Task<IActionResult> DeleteLead(int id)
+    {
+        var leadDeletado = await _leadService.DeleteLead(id);
+
+        if (!leadDeletado)
+        {
+            return NotFound(new
+            {
+                mensagem = "Lead não encontrado para exclusão."
+            });
+        }
+
+        return Ok(new
+        {
+            mensagem = "Lead deletado com sucesso."
+        });
     }
 }
