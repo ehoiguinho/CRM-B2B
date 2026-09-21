@@ -10,6 +10,7 @@ public class AppDbContext : DbContext
     public DbSet<Usuario> Usuarios { get; set; } = null!;
     public DbSet<Cliente> Clientes { get; set;} = null!;
     public DbSet<Contato> Contatos {get; set; } = null!;
+    public DbSet<Lead> Leads { get; set; } = null!;
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Usuario>()
@@ -112,7 +113,48 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Contato>()
             .Property(c => c.CriadoEm)
             .HasColumnName("criado_em");
-        
+        modelBuilder.Entity<Lead>()
+        .ToTable("tb_lead");
+
+        modelBuilder.Entity<Lead>()
+            .Property(l => l.Id)
+            .HasColumnName("id");
+
+        modelBuilder.Entity<Lead>()
+            .Property(l => l.Nome)
+            .HasColumnName("nome");
+
+        modelBuilder.Entity<Lead>()
+            .Property(l => l.Empresa)
+            .HasColumnName("empresa");
+
+        modelBuilder.Entity<Lead>()
+            .Property(l => l.Email)
+            .HasColumnName("email");
+
+        modelBuilder.Entity<Lead>()
+            .Property(l => l.Telefone)
+            .HasColumnName("telefone");
+
+        modelBuilder.Entity<Lead>()
+            .Property(l => l.Origem)
+            .HasColumnName("origem");
+
+        modelBuilder.Entity<Lead>()
+            .Property(l => l.Status)
+            .HasColumnName("status")
+            .HasDefaultValue("NOVO")
+            .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<Lead>()
+            .Property(l => l.Observacao)
+            .HasColumnName("observacao");
+
+        modelBuilder.Entity<Lead>()
+            .Property(l => l.CriadoEm)
+            .HasColumnName("criado_em")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .ValueGeneratedOnAdd();
     }
 
 }
