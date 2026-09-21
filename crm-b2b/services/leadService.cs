@@ -1,5 +1,3 @@
-
-
 using Microsoft.AspNetCore.DataProtection.AuthenticatedEncryption;
 using Microsoft.EntityFrameworkCore;
 

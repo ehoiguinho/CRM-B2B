@@ -11,7 +11,7 @@ public class LeadController : ControllerBase
     {
         _leadService = leadService;
     }
-[HttpPost][Authorize(Roles = "ADMIN") ]
+[HttpPost][Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> PostLead(LeadRequest leadRequest)
         {
         var lead = await _leadService.PostLead(leadRequest);
