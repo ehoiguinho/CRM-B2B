@@ -27,13 +27,13 @@ API REST de um **CRM B2B** para gerenciamento do ciclo comercial, desenvolvida c
 
 ## Roadmap
 
-* [x] Usuários e autenticação
-* [x] Clientes
-* [x] Contatos
-* [x] Leads
-* [ ] Pipeline de vendas
-* [ ] Oportunidades
-* [ ] Atividades
+* [X] Usuários e autenticação
+* [X] Clientes
+* [X] Contatos
+* [X] Leads
+* [X] Pipeline de vendas
+* [X] Oportunidades
+* [X] Atividades
 * [ ] Contratos
 * [ ] Financeiro
 * [ ] Testes automatizados
