@@ -159,18 +159,62 @@ public class OportunidadeService
         return response;
     }
 
-    public async Task<bool> DeleteOportunidade(int id)
-    {
-        var oportunidade = await _context.Oportunidades.FirstOrDefaultAsync(o => o.Id == id);
-        if(oportunidade == null)
+        public async Task<bool> DeleteOportunidade(int id)
         {
-            return false;
+            var oportunidade = await _context.Oportunidades.FirstOrDefaultAsync(o => o.Id == id);
+            if(oportunidade == null)
+            {
+                return false;
+            }
+
+            _context.Oportunidades.Remove(oportunidade);
+            await _context.SaveChangesAsync();
+
+            return true;
         }
 
-        _context.Oportunidades.Remove(oportunidade);
-        await _context.SaveChangesAsync();
+        public async Task<AtividadeResponse?> AlterarStatus(int id, AtividadeStatusRequest atividadeRequest)
+        {
 
-        return true;
+            var atividadeExistente = await _context.Atividades.FirstOrDefaultAsync(a => a.Id == id);
+
+            if (atividadeExistente == null)
+            {
+                return null;
+            }
+
+            var transicoesPermitidas = new Dictionary<string, string[]>
+            {
+                ["PENDENTE"] = new[] { "CONCLUIDA" }
+            };
+
+            if (!transicoesPermitidas.TryGetValue(
+                    atividadeExistente.Status,
+                    out var statusPermitidos)
+                || !statusPermitidos.Contains(atividadeRequest.Status))
+            {
+                throw new BusinessException(
+                    "Transição de status não permitida."
+                );
+            }
+
+            atividadeExistente.Status = atividadeRequest.Status;
+
+            await _context.SaveChangesAsync();
+
+            var response = new AtividadeResponse
+            {
+                Id = atividadeExistente.Id,
+                OportunidadeId = atividadeExistente.OportunidadeId,
+                Tipo = atividadeExistente.Tipo,
+                Titulo = atividadeExistente.Titulo,
+                Descricao = atividadeExistente.Descricao,
+                DataAgendada = atividadeExistente.DataAgendada,
+                Status = atividadeExistente.Status,
+                CriadoEm = atividadeExistente.CriadoEm
+            };
+
+        return response;
     }
 
 }

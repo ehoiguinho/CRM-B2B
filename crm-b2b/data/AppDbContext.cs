@@ -12,6 +12,7 @@ public class AppDbContext : DbContext
     public DbSet<Contato> Contatos {get; set; } = null!;
     public DbSet<Lead> Leads { get; set; } = null!;
     public DbSet<Oportunidade> Oportunidades { get; set; } = null!;
+    public DbSet<Atividade> Atividades { get; set; } = null!;
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Usuario>()
@@ -191,6 +192,54 @@ public class AppDbContext : DbContext
             .HasColumnName("criado_em")
             .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .ValueGeneratedOnAdd();
+        modelBuilder.Entity<Atividade>()
+        .ToTable("tb_atividade");
+
+        modelBuilder.Entity<Atividade>()
+            .Property(a => a.Id)
+            .HasColumnName("id");
+
+        modelBuilder.Entity<Atividade>()
+            .Property(a => a.OportunidadeId)
+            .HasColumnName("oportunidade_id");
+
+        modelBuilder.Entity<Atividade>()
+            .Property(a => a.Tipo)
+            .HasColumnName("tipo");
+
+        modelBuilder.Entity<Atividade>()
+            .Property(a => a.Titulo)
+            .HasColumnName("titulo");
+
+        modelBuilder.Entity<Atividade>()
+            .Property(a => a.Descricao)
+            .HasColumnName("descricao");
+
+        modelBuilder.Entity<Atividade>()
+            .Property(a => a.DataAgendada)
+            .HasColumnName("data_agendada");
+
+        modelBuilder.Entity<Atividade>()
+            .Property(a => a.Status)
+            .HasColumnName("status")
+            .HasDefaultValue("PENDENTE")
+            .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<Atividade>()
+            .Property(a => a.CriadoEm)
+            .HasColumnName("criado_em")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<Atividade>()
+            .Property(a => a.Ativo)
+            .HasColumnName("ativo")
+            .HasDefaultValue(true);
+
+        modelBuilder.Entity<Atividade>()
+            .HasOne(a => a.Oportunidade)
+            .WithMany()
+            .HasForeignKey(a => a.OportunidadeId);
     }
 
 }
