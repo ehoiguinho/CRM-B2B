@@ -11,6 +11,7 @@ public class AppDbContext : DbContext
     public DbSet<Cliente> Clientes { get; set;} = null!;
     public DbSet<Contato> Contatos {get; set; } = null!;
     public DbSet<Lead> Leads { get; set; } = null!;
+    public DbSet<Oportunidade> Oportunidades { get; set; } = null!;
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Usuario>()
@@ -152,6 +153,41 @@ public class AppDbContext : DbContext
 
         modelBuilder.Entity<Lead>()
             .Property(l => l.CriadoEm)
+            .HasColumnName("criado_em")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .ValueGeneratedOnAdd();
+        modelBuilder.Entity<Oportunidade>()
+        .ToTable("tb_oportunidade");
+
+        modelBuilder.Entity<Oportunidade>()
+            .Property(o => o.Id)
+            .HasColumnName("id");
+
+        modelBuilder.Entity<Oportunidade>()
+            .Property(o => o.ClienteId)
+            .HasColumnName("cliente_id");
+
+        modelBuilder.Entity<Oportunidade>()
+            .Property(o => o.Titulo)
+            .HasColumnName("titulo");
+
+        modelBuilder.Entity<Oportunidade>()
+            .Property(o => o.Descricao)
+            .HasColumnName("descricao");
+
+        modelBuilder.Entity<Oportunidade>()
+            .Property(o => o.Valor)
+            .HasColumnName("valor")
+            .HasPrecision(15, 2);
+
+        modelBuilder.Entity<Oportunidade>()
+            .Property(o => o.Etapa)
+            .HasColumnName("etapa")
+            .HasDefaultValue("ABERTA")
+            .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<Oportunidade>()
+            .Property(o => o.CriadoEm)
             .HasColumnName("criado_em")
             .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .ValueGeneratedOnAdd();
