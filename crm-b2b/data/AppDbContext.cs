@@ -18,6 +18,7 @@ public class AppDbContext : DbContext
     public DbSet<Pagamento> Pagamentos { get; set; } = null!;
     public DbSet<ProdutoServico> ProdutosServicos { get; set; } = null!;
     public DbSet<OportunidadeItem> OportunidadeItens { get; set; } = null!;
+    public DbSet<Inadimplencia> Inadimplencias { get; set; } = null!;
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Usuario>()
@@ -458,6 +459,47 @@ public class AppDbContext : DbContext
             .HasOne(i => i.ProdutoServico)
             .WithMany()
             .HasForeignKey(i => i.ProdutoServicoId);
+        
+        modelBuilder.Entity<Inadimplencia>()
+            .ToTable("tb_inadimplencia");
+
+        modelBuilder.Entity<Inadimplencia>()
+            .Property(i => i.Id)
+            .HasColumnName("id");
+
+        modelBuilder.Entity<Inadimplencia>()
+            .Property(i => i.FaturaId)
+            .HasColumnName("fatura_id");
+
+        modelBuilder.Entity<Inadimplencia>()
+            .Property(i => i.ValorEmAberto)
+            .HasColumnName("valor_em_aberto")
+            .HasPrecision(15, 2);
+
+        modelBuilder.Entity<Inadimplencia>()
+            .Property(i => i.DataInadimplencia)
+            .HasColumnName("data_inadimplencia");
+
+        modelBuilder.Entity<Inadimplencia>()
+            .Property(i => i.Status)
+            .HasColumnName("status")
+            .HasDefaultValue("ABERTA")
+            .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<Inadimplencia>()
+            .Property(i => i.DataRegularizacao)
+            .HasColumnName("data_regularizacao");
+
+        modelBuilder.Entity<Inadimplencia>()
+            .Property(i => i.CriadoEm)
+            .HasColumnName("criado_em")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<Inadimplencia>()
+            .HasOne(i => i.Fatura)
+            .WithMany()
+            .HasForeignKey(i => i.FaturaId);
     }
     
 }
