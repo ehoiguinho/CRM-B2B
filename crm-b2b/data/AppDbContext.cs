@@ -16,6 +16,7 @@ public class AppDbContext : DbContext
     public DbSet<Contrato> Contratos { get; set; } = null!;
     public DbSet<Fatura> Faturas { get; set; } = null!;
     public DbSet<Pagamento> Pagamentos { get; set; } = null!;
+    public DbSet<ProdutoServico> ProdutosServicos { get; set; } = null!;
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Usuario>()
@@ -118,7 +119,7 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Contato>()
             .Property(c => c.CriadoEm)
             .HasColumnName("criado_em");
-            
+
         modelBuilder.Entity<Lead>()
         .ToTable("tb_lead");
 
@@ -385,6 +386,43 @@ public class AppDbContext : DbContext
             .HasOne(p => p.Fatura)
             .WithMany()
             .HasForeignKey(p => p.FaturaId);
+
+        modelBuilder.Entity<ProdutoServico>()
+            .ToTable("tb_produto_servico");
+
+        modelBuilder.Entity<ProdutoServico>()
+            .Property(p => p.Id)
+            .HasColumnName("id");
+
+        modelBuilder.Entity<ProdutoServico>()
+            .Property(p => p.Nome)
+            .HasColumnName("nome");
+
+        modelBuilder.Entity<ProdutoServico>()
+            .Property(p => p.Descricao)
+            .HasColumnName("descricao");
+
+        modelBuilder.Entity<ProdutoServico>()
+            .Property(p => p.Tipo)
+            .HasColumnName("tipo")
+            .HasDefaultValue("SERVICO")
+            .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<ProdutoServico>()
+            .Property(p => p.Valor)
+            .HasColumnName("valor")
+            .HasPrecision(15, 2);
+
+        modelBuilder.Entity<ProdutoServico>()
+            .Property(p => p.Ativo)
+            .HasColumnName("ativo")
+            .HasDefaultValue(true);
+
+        modelBuilder.Entity<ProdutoServico>()
+            .Property(p => p.CriadoEm)
+            .HasColumnName("criado_em")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .ValueGeneratedOnAdd();
     }
     
 }
