@@ -17,6 +17,7 @@ public class AppDbContext : DbContext
     public DbSet<Fatura> Faturas { get; set; } = null!;
     public DbSet<Pagamento> Pagamentos { get; set; } = null!;
     public DbSet<ProdutoServico> ProdutosServicos { get; set; } = null!;
+    public DbSet<OportunidadeItem> OportunidadeItens { get; set; } = null!;
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Usuario>()
@@ -423,6 +424,40 @@ public class AppDbContext : DbContext
             .HasColumnName("criado_em")
             .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<OportunidadeItem>()
+            .ToTable("tb_oportunidade_item");
+
+        modelBuilder.Entity<OportunidadeItem>()
+            .Property(i => i.Id)
+            .HasColumnName("id");
+
+        modelBuilder.Entity<OportunidadeItem>()
+            .Property(i => i.OportunidadeId)
+            .HasColumnName("oportunidade_id");
+
+        modelBuilder.Entity<OportunidadeItem>()
+            .Property(i => i.ProdutoServicoId)
+            .HasColumnName("produto_servico_id");
+
+        modelBuilder.Entity<OportunidadeItem>()
+            .Property(i => i.Quantidade)
+            .HasColumnName("quantidade");
+
+        modelBuilder.Entity<OportunidadeItem>()
+            .Property(i => i.ValorUnitario)
+            .HasColumnName("valor_unitario")
+            .HasPrecision(15, 2);
+
+        modelBuilder.Entity<OportunidadeItem>()
+            .HasOne(i => i.Oportunidade)
+            .WithMany()
+            .HasForeignKey(i => i.OportunidadeId);
+
+        modelBuilder.Entity<OportunidadeItem>()
+            .HasOne(i => i.ProdutoServico)
+            .WithMany()
+            .HasForeignKey(i => i.ProdutoServicoId);
     }
     
 }
