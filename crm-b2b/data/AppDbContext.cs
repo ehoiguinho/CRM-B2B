@@ -14,6 +14,7 @@ public class AppDbContext : DbContext
     public DbSet<Oportunidade> Oportunidades { get; set; } = null!;
     public DbSet<Atividade> Atividades { get; set; } = null!;
     public DbSet<Contrato> Contratos { get; set; } = null!;
+    public DbSet<Fatura> Faturas { get; set; } = null!;
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Usuario>()
@@ -289,7 +290,57 @@ public class AppDbContext : DbContext
             .HasColumnName("criado_em")
             .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<Fatura>()
+            .ToTable("tb_fatura");
+
+        modelBuilder.Entity<Fatura>()
+            .Property(f => f.Id)
+            .HasColumnName("id");
+
+        modelBuilder.Entity<Fatura>()
+            .Property(f => f.ContratoId)
+            .HasColumnName("contrato_id");
+
+        modelBuilder.Entity<Fatura>()
+            .Property(f => f.Numero)
+            .HasColumnName("numero");
+
+        modelBuilder.Entity<Fatura>()
+            .Property(f => f.Descricao)
+            .HasColumnName("descricao");
+
+        modelBuilder.Entity<Fatura>()
+            .Property(f => f.Valor)
+            .HasColumnName("valor")
+            .HasPrecision(15, 2);
+
+        modelBuilder.Entity<Fatura>()
+            .Property(f => f.DataEmissao)
+            .HasColumnName("data_emissao")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<Fatura>()
+            .Property(f => f.DataVencimento)
+            .HasColumnName("data_vencimento");
+
+        modelBuilder.Entity<Fatura>()
+            .Property(f => f.Status)
+            .HasColumnName("status")
+            .HasDefaultValue("PENDENTE")
+            .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<Fatura>()
+            .Property(f => f.CriadoEm)
+            .HasColumnName("criado_em")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<Fatura>()
+            .HasOne(f => f.Contrato)
+            .WithMany()
+            .HasForeignKey(f => f.ContratoId);
     }
     
-
 }
