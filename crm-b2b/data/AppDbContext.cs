@@ -15,6 +15,7 @@ public class AppDbContext : DbContext
     public DbSet<Atividade> Atividades { get; set; } = null!;
     public DbSet<Contrato> Contratos { get; set; } = null!;
     public DbSet<Fatura> Faturas { get; set; } = null!;
+    public DbSet<Pagamento> Pagamentos { get; set; } = null!;
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Usuario>()
@@ -117,6 +118,7 @@ public class AppDbContext : DbContext
         modelBuilder.Entity<Contato>()
             .Property(c => c.CriadoEm)
             .HasColumnName("criado_em");
+            
         modelBuilder.Entity<Lead>()
         .ToTable("tb_lead");
 
@@ -159,6 +161,7 @@ public class AppDbContext : DbContext
             .HasColumnName("criado_em")
             .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .ValueGeneratedOnAdd();
+
         modelBuilder.Entity<Oportunidade>()
         .ToTable("tb_oportunidade");
 
@@ -341,6 +344,47 @@ public class AppDbContext : DbContext
             .HasOne(f => f.Contrato)
             .WithMany()
             .HasForeignKey(f => f.ContratoId);
+
+        modelBuilder.Entity<Pagamento>()
+            .ToTable("tb_pagamento");
+
+        modelBuilder.Entity<Pagamento>()
+            .Property(p => p.Id)
+            .HasColumnName("id");
+
+        modelBuilder.Entity<Pagamento>()
+            .Property(p => p.FaturaId)
+            .HasColumnName("fatura_id");
+
+        modelBuilder.Entity<Pagamento>()
+            .Property(p => p.Valor)
+            .HasColumnName("valor")
+            .HasPrecision(15, 2);
+
+        modelBuilder.Entity<Pagamento>()
+            .Property(p => p.DataPagamento)
+            .HasColumnName("data_pagamento");
+
+        modelBuilder.Entity<Pagamento>()
+            .Property(p => p.FormaPagamento)
+            .HasColumnName("forma_pagamento");
+
+        modelBuilder.Entity<Pagamento>()
+            .Property(p => p.Status)
+            .HasColumnName("status")
+            .HasDefaultValue("CONFIRMADO")
+            .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<Pagamento>()
+            .Property(p => p.CriadoEm)
+            .HasColumnName("criado_em")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<Pagamento>()
+            .HasOne(p => p.Fatura)
+            .WithMany()
+            .HasForeignKey(p => p.FaturaId);
     }
     
 }
