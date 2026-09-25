@@ -50,6 +50,7 @@ builder.Services.AddScoped<AtividadeService>();
 builder.Services.AddScoped<FaturaService>();
 builder.Services.AddScoped<PagamentoService>();
 builder.Services.AddScoped<ProdutoService>();
+builder.Services.AddScoped<OportunidadeItemService>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddOpenApi();
