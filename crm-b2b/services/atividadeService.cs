@@ -9,8 +9,7 @@ public class AtividadeService
         _context = context;
     }
 
-    public async Task<AtividadeResponse> PostAtividade(
-        AtividadeRequest atividadeRequest)
+    public async Task<AtividadeResponse> PostAtividade(AtividadeRequest atividadeRequest)
     {
         var oportunidadeExiste = await _context.Oportunidades
             .AnyAsync(o => o.Id == atividadeRequest.OportunidadeId);

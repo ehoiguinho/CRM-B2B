@@ -13,6 +13,7 @@ public class AppDbContext : DbContext
     public DbSet<Lead> Leads { get; set; } = null!;
     public DbSet<Oportunidade> Oportunidades { get; set; } = null!;
     public DbSet<Atividade> Atividades { get; set; } = null!;
+    public DbSet<Contrato> Contratos { get; set; } = null!;
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Usuario>()
@@ -240,6 +241,55 @@ public class AppDbContext : DbContext
             .HasOne(a => a.Oportunidade)
             .WithMany()
             .HasForeignKey(a => a.OportunidadeId);
+
+        modelBuilder.Entity<Contrato>()
+            .ToTable("tb_contrato");
+
+        modelBuilder.Entity<Contrato>()
+            .Property(c => c.Id)
+            .HasColumnName("id");
+
+        modelBuilder.Entity<Contrato>()
+            .Property(c => c.ClienteId)
+            .HasColumnName("cliente_id");
+
+        modelBuilder.Entity<Contrato>()
+            .Property(c => c.Numero)
+            .HasColumnName("numero");
+
+        modelBuilder.Entity<Contrato>()
+            .Property(c => c.Titulo)
+            .HasColumnName("titulo");
+
+        modelBuilder.Entity<Contrato>()
+            .Property(c => c.Descricao)
+            .HasColumnName("descricao");
+
+        modelBuilder.Entity<Contrato>()
+            .Property(c => c.Valor)
+            .HasColumnName("valor")
+            .HasPrecision(15, 2);
+
+        modelBuilder.Entity<Contrato>()
+            .Property(c => c.DataInicio)
+            .HasColumnName("data_inicio");
+
+        modelBuilder.Entity<Contrato>()
+            .Property(c => c.DataFim)
+            .HasColumnName("data_fim");
+
+        modelBuilder.Entity<Contrato>()
+            .Property(c => c.Status)
+            .HasColumnName("status")
+            .HasDefaultValue("RASCUNHO")
+            .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<Contrato>()
+            .Property(c => c.CriadoEm)
+            .HasColumnName("criado_em")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .ValueGeneratedOnAdd();
     }
+    
 
 }
