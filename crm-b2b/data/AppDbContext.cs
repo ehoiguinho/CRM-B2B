@@ -19,6 +19,7 @@ public class AppDbContext : DbContext
     public DbSet<ProdutoServico> ProdutosServicos { get; set; } = null!;
     public DbSet<OportunidadeItem> OportunidadeItens { get; set; } = null!;
     public DbSet<Inadimplencia> Inadimplencias { get; set; } = null!;
+    public DbSet<HistoricoStatus> HistoricoStatus { get; set;} = null!;
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Usuario>()
@@ -500,6 +501,43 @@ public class AppDbContext : DbContext
             .HasOne(i => i.Fatura)
             .WithMany()
             .HasForeignKey(i => i.FaturaId);
+        modelBuilder.Entity<HistoricoStatus>()
+            .ToTable("tb_historico_status");
+
+        modelBuilder.Entity<HistoricoStatus>()
+            .Property(h => h.Id)
+            .HasColumnName("id");
+
+        modelBuilder.Entity<HistoricoStatus>()
+            .Property(h => h.Entidade)
+            .HasColumnName("entidade");
+
+        modelBuilder.Entity<HistoricoStatus>()
+            .Property(h => h.EntidadeId)
+            .HasColumnName("entidade_id");
+
+        modelBuilder.Entity<HistoricoStatus>()
+            .Property(h => h.StatusAnterior)
+            .HasColumnName("status_anterior");
+
+        modelBuilder.Entity<HistoricoStatus>()
+            .Property(h => h.StatusNovo)
+            .HasColumnName("status_novo");
+
+        modelBuilder.Entity<HistoricoStatus>()
+            .Property(h => h.UsuarioId)
+            .HasColumnName("usuario_id");
+
+        modelBuilder.Entity<HistoricoStatus>()
+            .Property(h => h.CriadoEm)
+            .HasColumnName("criado_em")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .ValueGeneratedOnAdd();
+
+        modelBuilder.Entity<HistoricoStatus>()
+            .HasOne(h => h.Usuario)
+            .WithMany()
+            .HasForeignKey(h => h.UsuarioId);
     }
     
 }
