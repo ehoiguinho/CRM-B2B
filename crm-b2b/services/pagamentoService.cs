@@ -1,4 +1,7 @@
 using Microsoft.EntityFrameworkCore;
+using System.Security.Cryptography;
+using System.Text;
+using System.Text.Json;
 
 public class PagamentoService
 {
@@ -11,8 +14,50 @@ public class PagamentoService
         _historicoStatusService = historicoStatusService;
     }
 
-    public async Task<PagamentoResponse> PostPagamento(PagamentoRequest pagamentoRequest)
+    private static string GerarHash(PagamentoRequest request)
     {
+        var dados = new
+        {
+            request.FaturaId,
+            request.Valor,
+            request.DataPagamento,
+            request.FormaPagamento
+        };
+
+        var json = JsonSerializer.Serialize(dados);
+
+        var bytes = SHA256.HashData(Encoding.UTF8.GetBytes(json));
+
+        return Convert.ToHexString(bytes);
+    }
+    public async Task<PagamentoResponse> PostPagamento(PagamentoRequest pagamentoRequest, string chaveIdempotencia)
+    {
+        var requestHash = GerarHash(pagamentoRequest);
+
+        var registroExistente = await _context.Idempotencias.FirstOrDefaultAsync(i => i.Chave == chaveIdempotencia);
+
+        if (registroExistente != null)
+        {
+            if (registroExistente.RequestHash != requestHash)
+            {
+            throw new BusinessException(
+                "A Idempotency-Key já foi utilizada com dados diferentes.",
+                409
+            );
+            }
+
+            var respostaAnterior = JsonSerializer.Deserialize<IdempotencyResponse>(registroExistente.ResponseBody, new JsonSerializerOptions
+                {
+                    PropertyNameCaseInsensitive = true
+                }
+            );
+            
+            return respostaAnterior!.Response;
+        }
+            await using var transaction = await _context.Database.BeginTransactionAsync();
+
+        try{
+
         var fatura = await _context.Faturas.FirstOrDefaultAsync(f => f.Id == pagamentoRequest.FaturaId);
 
         if (fatura == null)
@@ -77,7 +122,34 @@ public class PagamentoService
             CriadoEm = pagamento.CriadoEm
         };
 
-        return response; 
+        var responseBody = JsonSerializer.Serialize(new
+        {
+            mensagem = "Pagamento realizado com sucesso.", response
+        });
+
+
+         var idempotencia = new Idempotencia
+        {
+            Chave = chaveIdempotencia,
+            RequestHash = requestHash,
+            StatusCode = 201,
+            ResponseBody = responseBody
+        };
+
+        _context.Idempotencias.Add(idempotencia);
+
+        await _context.SaveChangesAsync();
+
+        await transaction.CommitAsync();
+
+        return response;
+        }
+
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
 
 
@@ -289,5 +361,6 @@ public class PagamentoService
 
         return true;
     }
+
 
 }

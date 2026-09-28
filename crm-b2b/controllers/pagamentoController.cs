@@ -13,15 +13,33 @@ public class PagamentoController : ControllerBase
     }
 
     [HttpPost][Authorize(Roles = "ADMIN")]
-    public async Task<IActionResult> PostPagamento(PagamentoRequest pagamentoRequest)
-    {
-        var pagamento = await _pagamentoService.PostPagamento(pagamentoRequest);
+    public async Task<IActionResult> PostPagamento(PagamentoRequest pagamentoRequest,
+    [FromHeader(Name = "Idempotency-Key")] string idempotencyKey)    {
 
-        return CreatedAtAction("GetPagamento",new { id = pagamento.Id }, new
+        if (string.IsNullOrWhiteSpace(idempotencyKey))
+        {
+            return BadRequest(new
+            {
+                mensagem = "O cabeçalho Idempotency-Key é obrigatório."
+            });
+        }
+
+        if (!Guid.TryParse(idempotencyKey, out var chave))
+        {
+            return BadRequest(new
+            {
+                mensagem = "A Idempotency-Key deve ser um GUID válido."
+            });
+        }
+
+        var response = await _pagamentoService.PostPagamento(pagamentoRequest, chave.ToString());
+
+        return CreatedAtAction(nameof(GetPagamento),new { id = response.Id }, new
             {
                 mensagem = "Pagamento registrado com sucesso.",
-                pagamento
+                response
             }
+
         );
     }
 
