@@ -70,6 +70,7 @@ public class LeadService
             Status = l.Status,
             Observacao = l.Observacao,
             CriadoEm = l.CriadoEm,
+            UsuarioResponsavelId = l.UsuarioResponsavelId
 
         }).ToList();
 
@@ -179,6 +180,53 @@ public class LeadService
         await _context.SaveChangesAsync();
 
         return true;
-    }   
+    }
+
+    public async Task<LeadResponse?> AlterarResponsavel(int id, LeadResponsavelRequest leadRequest)
+    {
+        var lead = await _context.Leads.FirstOrDefaultAsync(l => l.Id == id);
+        if(lead == null)
+        {
+            return null;
+        }
+
+        var usuario = await _context.Usuarios.FirstOrDefaultAsync(u => u.Id == leadRequest.UsuarioResponsavelId);
+        if(usuario == null)
+        {
+            throw new BusinessException("Usuário responsavel não encontrado.", 404);
+        }
+
+        if(usuario.Perfil != "USER")
+        {
+            throw new BusinessException("O responsavel pelo lead deve possuir o perfil de USER");
+        }
+
+        if (lead.UsuarioResponsavelId == usuario.Id)
+        {
+            throw new BusinessException(
+                "O usuário informado já é o responsável pelo Lead."
+            );
+        }
+
+        lead.UsuarioResponsavelId = usuario.Id;
+
+        await _context.SaveChangesAsync();
+
+        var response = new LeadResponse
+        {
+          Id = lead.Id,
+            Nome = lead.Nome,
+            Empresa = lead.Empresa,
+            Email = lead.Email,
+            Telefone = lead.Telefone,
+            Origem = lead.Origem,
+            Status = lead.Status,
+            Observacao = lead.Observacao,
+            CriadoEm = lead.CriadoEm,
+            UsuarioResponsavelId = lead.UsuarioResponsavelId
+        };
+
+        return response;
+    }
 
 }

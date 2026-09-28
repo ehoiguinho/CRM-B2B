@@ -69,6 +69,24 @@ public class LeadController : ControllerBase
 
         return Ok(statusAlterado);
     }
+    [HttpPatch("{id}/responsavel")][Authorize(Roles = "ADMIN")]
+    public async Task<IActionResult>PatchResponsavel(int id, LeadResponsavelRequest leadRequest)
+    {
+        var lead = await _leadService.AlterarResponsavel(id, leadRequest);
+        if(lead == null)
+        {
+            return NotFound(new
+            {
+                mensagem = "Lead não encontrado no sistema."
+            });
+        }
+
+        return Ok(new
+        {
+            mensagem = "Usuário responsável pelo lead alterado com sucesso."
+        });
+    }
+
     [HttpDelete("{id}")][Authorize(Roles = "ADMIN")]
     public async Task<IActionResult> DeleteLead(int id)
     {
