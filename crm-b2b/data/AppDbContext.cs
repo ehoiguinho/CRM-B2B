@@ -166,6 +166,15 @@ public class AppDbContext : DbContext
             .HasDefaultValueSql("CURRENT_TIMESTAMP")
             .ValueGeneratedOnAdd();
 
+        modelBuilder.Entity<Lead>()
+            .Property(l => l.UsuarioResponsavelId)
+            .HasColumnName("usuario_responsavel_id");
+
+        modelBuilder.Entity<Lead>()
+            .HasOne(l => l.UsuarioResponsavel)
+            .WithMany()
+            .HasForeignKey(l => l.UsuarioResponsavelId);
+
         modelBuilder.Entity<Oportunidade>()
         .ToTable("tb_oportunidade");
 

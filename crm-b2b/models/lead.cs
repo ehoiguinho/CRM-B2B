@@ -17,4 +17,7 @@ public class Lead
     public string? Observacao { get; set; }
 
     public DateTime CriadoEm { get; set; }
+
+    public int UsuarioResponsavelId { get; set; }
+    public Usuario UsuarioResponsavel { get; set; } = null!;
 }

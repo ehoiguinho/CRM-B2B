@@ -15,6 +15,15 @@ public class LeadService
 
     public async Task<LeadResponse>PostLead(LeadRequest leadRequest)
     {
+        var usuarioResponsavel = await _context.Usuarios.Where(u => u.Perfil == "USER").OrderBy(u => _context.Leads.Count(l => l.UsuarioResponsavelId == u.Id)).FirstOrDefaultAsync();
+        
+        if (usuarioResponsavel == null)
+        {
+        throw new BusinessException(
+            "Não existem usuários disponíveis para receber o Lead."
+        );
+        }
+        
         var lead = new Lead
         {
             Nome = leadRequest.Nome,
@@ -22,8 +31,8 @@ public class LeadService
             Email = leadRequest.Email,
             Telefone = leadRequest.Telefone,
             Origem = leadRequest.Origem,
-            Observacao = leadRequest.Observacao
-
+            Observacao = leadRequest.Observacao,
+            UsuarioResponsavelId = usuarioResponsavel.Id
         };
 
         await _context.Leads.AddAsync(lead);
@@ -40,6 +49,7 @@ public class LeadService
             Status = lead.Status,
             Observacao = lead.Observacao,
             CriadoEm = lead.CriadoEm,
+            UsuarioResponsavelId = lead.UsuarioResponsavelId
         };
 
         return response;
