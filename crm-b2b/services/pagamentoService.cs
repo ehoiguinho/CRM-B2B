@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore;
 public class PagamentoService
 {
     private readonly AppDbContext _context;
+    private readonly HistoricoStatusService _historicoStatusService;
 
-    public PagamentoService(AppDbContext context)
+    public PagamentoService(AppDbContext context, HistoricoStatusService historicoStatusService)
     {
         _context = context;
+        _historicoStatusService = historicoStatusService;
     }
 
     public async Task<PagamentoResponse> PostPagamento(PagamentoRequest pagamentoRequest)
@@ -195,6 +197,7 @@ public class PagamentoService
             );
         }
 
+        var statusAnterior = pagamento.Status;
         pagamento.Status = pagamentoRequest.Status;
 
         if (pagamentoRequest.Status == "CANCELADO")
@@ -223,6 +226,7 @@ public class PagamentoService
             }
         }
 
+        await _historicoStatusService.Registrar("PAGAMENTO", pagamento.Id, statusAnterior, pagamento.Status);
         await _context.SaveChangesAsync();
 
         var response = new PagamentoResponse
@@ -254,6 +258,7 @@ public class PagamentoService
             );
         }
 
+        var statusAnterior = pagamento.Status;
         pagamento.Status = "CANCELADO";
 
         var fatura = await _context.Faturas
@@ -279,6 +284,7 @@ public class PagamentoService
             }
         }
 
+        await _historicoStatusService.Registrar("PAGAMENTO", pagamento.Id, statusAnterior, pagamento.Status);
         await _context.SaveChangesAsync();
 
         return true;

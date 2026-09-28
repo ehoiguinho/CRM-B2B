@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore;
 public class OportunidadeService
 {
     private readonly AppDbContext _context;
+    private readonly HistoricoStatusService _historicoStatusService;
 
-    public OportunidadeService(AppDbContext context)
+    public OportunidadeService(AppDbContext context, HistoricoStatusService historicoStatusService)
     {
         _context = context;
+        _historicoStatusService = historicoStatusService;
     }
 
     public async Task<OportunidadeResponse> PostOportunidade(
@@ -142,7 +144,11 @@ public class OportunidadeService
             "Transição de etapa não permitida."
         );
         }
+
+        var etapaAnterior = oportunidadeExistente.Etapa;
         oportunidadeExistente.Etapa = oportunidadeRequest.Etapa;
+        await _historicoStatusService.Registrar("OPORTUNIDADE", oportunidadeExistente.Id,etapaAnterior, oportunidadeExistente.Etapa
+    );
         await _context.SaveChangesAsync();
 
         var response = new OportunidadeResponse

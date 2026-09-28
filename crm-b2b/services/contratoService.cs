@@ -5,9 +5,11 @@ using Microsoft.EntityFrameworkCore;
 public class ContratoService
 {
     private readonly AppDbContext _context;
-    public ContratoService(AppDbContext context)
+    private readonly HistoricoStatusService _historicoStatusService;
+    public ContratoService(AppDbContext context, HistoricoStatusService historicoStatusService)
     {
         _context = context;
+        _historicoStatusService = historicoStatusService;
     }
 
     public async Task<ContratoResponse> PostContrato(ContratoRequest contratoRequest)
@@ -170,17 +172,17 @@ public class ContratoService
                 $"Não é permitido alterar o contrato de {contrato.Status} para {contratoRequest.Status}."
             );
         }
-
+        var statusAnterior = contrato.Status;
         contrato.Status = contratoRequest.Status;
-
+        
+        await _historicoStatusService.Registrar("CONTRATO", contrato.Id, statusAnterior, contrato.Status);
         await _context.SaveChangesAsync();
 
         return MapearParaResponse(contrato);
     }
     public async Task<bool> DeleteContrato(int id)
     {
-        var contrato = await _context.Contratos
-            .FirstOrDefaultAsync(c => c.Id == id);
+        var contrato = await _context.Contratos.FirstOrDefaultAsync(c => c.Id == id);
 
         if (contrato == null)
         {
@@ -200,16 +202,16 @@ public class ContratoService
                 "O contrato já está cancelado."
             );
         }
-
+        var statusAnterior = contrato.Status;
         contrato.Status = "CANCELADO";
 
+        await _historicoStatusService.Registrar("CONTRATO", contrato.Id, statusAnterior, contrato.Status);
         await _context.SaveChangesAsync();
 
         return true;
     }
 
 
-    // Conversão Entity → Response
     private static ContratoResponse MapearParaResponse(
         Contrato contrato)
     {

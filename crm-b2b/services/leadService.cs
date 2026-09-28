@@ -5,10 +5,12 @@ using Microsoft.EntityFrameworkCore;
 public class LeadService
 {
     private readonly AppDbContext _context;
+    private readonly HistoricoStatusService _historicoStatusService;
 
-    public LeadService(AppDbContext context)
+    public LeadService(AppDbContext context, HistoricoStatusService historicoStatusService)
     {
         _context = context;
+        _historicoStatusService = historicoStatusService;
     }
 
     public async Task<LeadResponse>PostLead(LeadRequest leadRequest)
@@ -117,9 +119,18 @@ public class LeadService
         throw new BusinessException(
             "Transição de status não permitida."
         );
-        }
+        }  
 
+        var statusAnterior = leadExistente.Status;
         leadExistente.Status = leadRequest.Status;
+
+        await _historicoStatusService.Registrar(
+            "LEAD",
+            leadExistente.Id,
+            statusAnterior,
+            leadExistente.Status
+        );
+        
         await _context.SaveChangesAsync();
 
         var response = new LeadResponse
@@ -140,15 +151,21 @@ public class LeadService
 
     public async Task<bool> DeleteLead(int id)
     {
-        var lead = await _context.Leads
-            .FirstOrDefaultAsync(l => l.Id == id);
+        var lead = await _context.Leads.FirstOrDefaultAsync(l => l.Id == id);
 
         if (lead == null)
         {
             return false;
         }
+        if(lead.Status == "DESCARTADO" || lead.Status == "CONVERTIDO")
+        {
+            throw new BusinessException("Não é possível descartar um Lead que já foi descartado ou convertido.");
+        }
 
-        _context.Leads.Remove(lead);
+        var statusAnterior = lead.Status;
+        lead.Status = "DESCARTADO";
+
+        await _historicoStatusService.Registrar("LEAD", lead.Id, statusAnterior, lead.Status);
         await _context.SaveChangesAsync();
 
         return true;

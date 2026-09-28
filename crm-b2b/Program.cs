@@ -52,6 +52,7 @@ builder.Services.AddScoped<PagamentoService>();
 builder.Services.AddScoped<ProdutoService>();
 builder.Services.AddScoped<OportunidadeItemService>();
 builder.Services.AddScoped<InadimplenciaService>();
+builder.Services.AddScoped<HistoricoStatusService>();
 
 builder.Services.AddHttpContextAccessor();
 builder.Services.AddOpenApi();

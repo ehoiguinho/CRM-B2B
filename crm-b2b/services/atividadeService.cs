@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore;
 public class AtividadeService
 {
     private readonly AppDbContext _context;
+    private readonly HistoricoStatusService _historicoStatusService;
 
-    public AtividadeService(AppDbContext context)
+    public AtividadeService(AppDbContext context, HistoricoStatusService historicoStatusService)
     {
         _context = context;
+        _historicoStatusService = historicoStatusService;
     }
 
     public async Task<AtividadeResponse> PostAtividade(AtividadeRequest atividadeRequest)
@@ -151,7 +153,12 @@ public class AtividadeService
             );
         }
 
+        var statusAnterior = atividadeExistente.Status;
         atividadeExistente.Status = atividadeRequest.Status;
+
+        await _historicoStatusService.Registrar(
+            "ATIVIDADE", atividadeExistente.Id, statusAnterior, atividadeExistente.Status
+        );
 
         await _context.SaveChangesAsync();
 

@@ -3,10 +3,12 @@ using Microsoft.EntityFrameworkCore;
 public class FaturaService
 {
     private readonly AppDbContext _context;
+    private readonly HistoricoStatusService _historicoStatusService;
 
-    public FaturaService(AppDbContext context)
+    public FaturaService(AppDbContext context, HistoricoStatusService historicoStatusService)
     {
         _context = context;
+        _historicoStatusService = historicoStatusService;
     }
 
     public async Task<FaturaResponse> PostFatura(FaturaRequest faturaRequest)
@@ -188,8 +190,10 @@ public class FaturaService
             );
         }
 
+        var statusAnterior = fatura.Status;
         fatura.Status = faturaRequest.Status;
 
+        await _historicoStatusService.Registrar("FATURA", fatura.Id, statusAnterior, fatura.Status);
         await _context.SaveChangesAsync();
 
         var response = new FaturaResponse
@@ -229,9 +233,10 @@ public class FaturaService
                 "A fatura já está cancelada."
             );
         }
-
+        var statusAnterior = fatura.Status;
         fatura.Status = "CANCELADA";
 
+        await _historicoStatusService.Registrar("FATURA", fatura.Id, statusAnterior, fatura.Status);
         await _context.SaveChangesAsync();
 
         return true;

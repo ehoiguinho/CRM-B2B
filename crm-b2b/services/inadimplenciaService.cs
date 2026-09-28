@@ -3,10 +3,11 @@ using Microsoft.EntityFrameworkCore;
 public class InadimplenciaService
 {
     private readonly AppDbContext _context;
-
-    public InadimplenciaService(AppDbContext context)
+    private readonly HistoricoStatusService _historicoStatusService;
+    public InadimplenciaService(AppDbContext context, HistoricoStatusService historicoStatusService)
     {
         _context = context;
+        _historicoStatusService = historicoStatusService;
     }
 
     public async Task<int> VerificarInadimplencias()
@@ -94,7 +95,6 @@ public class InadimplenciaService
         return response;
     }
 
-    // PATCH/{id}/status - Alterar status
     public async Task<InadimplenciaResponse?> AlterarStatus(int id, InadimplenciaStatusRequest inadimplenciaRequest)
     {
         var inadimplencia = await _context.Inadimplencias.Include(i => i.Fatura).FirstOrDefaultAsync(i => i.Id == id);
@@ -125,6 +125,7 @@ public class InadimplenciaService
             );
         }
 
+        var statusAnterior = inadimplencia.Status;
         inadimplencia.Status = inadimplenciaRequest.Status;
 
         if (inadimplenciaRequest.Status == "REGULARIZADA")
@@ -142,6 +143,7 @@ public class InadimplenciaService
             inadimplencia.DataRegularizacao = null;
         }
 
+        await _historicoStatusService.Registrar("INADIMPLENCIA", inadimplencia.Id, statusAnterior, inadimplencia.Status);
         await _context.SaveChangesAsync();
 
         var response = new InadimplenciaResponse
@@ -181,8 +183,10 @@ public class InadimplenciaService
             );
         }
 
+        var statusAnterior = inadimplencia.Status;
         inadimplencia.Status = "CANCELADA";
 
+        await _historicoStatusService.Registrar("INADIMPLENCIA", inadimplencia.Id, statusAnterior, inadimplencia.Status);
         await _context.SaveChangesAsync();
 
         return true;
