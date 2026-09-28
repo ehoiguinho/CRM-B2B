@@ -19,7 +19,8 @@ public class AppDbContext : DbContext
     public DbSet<ProdutoServico> ProdutosServicos { get; set; } = null!;
     public DbSet<OportunidadeItem> OportunidadeItens { get; set; } = null!;
     public DbSet<Inadimplencia> Inadimplencias { get; set; } = null!;
-    public DbSet<HistoricoStatus> HistoricoStatus { get; set;} = null!;
+    public DbSet<HistoricoStatus> HistoricoStatus { get; set; } = null!;
+    public DbSet <Idempotencia> Idempotencias { get; set; } = null!;
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<Usuario>()
@@ -547,6 +548,49 @@ public class AppDbContext : DbContext
             .HasOne(h => h.Usuario)
             .WithMany()
             .HasForeignKey(h => h.UsuarioId);
+
+        modelBuilder.Entity<Idempotencia>()
+            .ToTable("tb_idempotencia");
+
+        modelBuilder.Entity<Idempotencia>()
+            .HasKey(i => i.Id);
+
+        modelBuilder.Entity<Idempotencia>()
+            .Property(i => i.Id)
+            .HasColumnName("id");
+
+        modelBuilder.Entity<Idempotencia>()
+            .Property(i => i.Chave)
+            .HasColumnName("chave")
+            .HasMaxLength(100)
+            .IsRequired();
+
+        modelBuilder.Entity<Idempotencia>()
+            .HasIndex(i => i.Chave)
+            .IsUnique();
+
+        modelBuilder.Entity<Idempotencia>()
+            .Property(i => i.RequestHash)
+            .HasColumnName("request_hash")
+            .HasMaxLength(64)
+            .IsRequired();
+
+        modelBuilder.Entity<Idempotencia>()
+            .Property(i => i.StatusCode)
+            .HasColumnName("status_code")
+            .IsRequired();
+
+        modelBuilder.Entity<Idempotencia>()
+            .Property(i => i.ResponseBody)
+            .HasColumnName("response_body")
+            .HasColumnType("jsonb")
+            .IsRequired();
+
+        modelBuilder.Entity<Idempotencia>()
+            .Property(i => i.CriadoEm)
+            .HasColumnName("criado_em")
+            .HasDefaultValueSql("CURRENT_TIMESTAMP")
+            .ValueGeneratedOnAdd();
     }
     
 }
