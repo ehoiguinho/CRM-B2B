@@ -11,6 +11,10 @@ public class OportunidadeItemService
 
     public async Task<OportunidadeItemResponse> PostItem(int oportunidadeId, OportunidadeItemRequest itemRequest)
     {
+
+        await using var transaction = await _context.Database.BeginTransactionAsync();
+
+        try{
         var oportunidade = await _context.Oportunidades.FirstOrDefaultAsync(o => o.Id == oportunidadeId);
 
         if (oportunidade == null)
@@ -65,11 +69,19 @@ public class OportunidadeItemService
 
         await _context.OportunidadeItens.AddAsync(item);
 
-        await _context.SaveChangesAsync();
-
         await AtualizarValorOportunidade(oportunidadeId);
 
+        await _context.SaveChangesAsync();
+
+        await transaction.CommitAsync();
+
         return MapearParaResponse(item, produto.Nome);
+    }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
     public async Task<List<OportunidadeItemResponse>> GetItens(int oportunidadeId)
     {
@@ -185,7 +197,7 @@ public class OportunidadeItemService
     }
     private async Task AtualizarValorOportunidade(int oportunidadeId)
     {
-        var valorTotal = await _context.OportunidadeItens.Where(i => i.OportunidadeId == oportunidadeId) .SumAsync(i => i.Quantidade * i.ValorUnitario);
+        var valorTotal = await _context.OportunidadeItens.Where(i => i.OportunidadeId == oportunidadeId).SumAsync(i => i.Quantidade * i.ValorUnitario);
 
         var oportunidade = await _context.Oportunidades.FirstOrDefaultAsync(o => o.Id == oportunidadeId);
 
@@ -195,8 +207,6 @@ public class OportunidadeItemService
         }
 
         oportunidade.Valor = valorTotal;
-
-        await _context.SaveChangesAsync();
     }
 
     private static OportunidadeItemResponse MapearParaResponse(
