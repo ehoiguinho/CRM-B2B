@@ -1,8 +1,10 @@
+using System.Linq.Expressions;
 using Microsoft.EntityFrameworkCore;
 
 public class OportunidadeItemService
 {
-    private readonly AppDbContext _context;
+    
+       private readonly AppDbContext _context;
 
     public OportunidadeItemService(AppDbContext context)
     {
@@ -124,6 +126,8 @@ public class OportunidadeItemService
     }
     public async Task<OportunidadeItemResponse?> PutItem(int oportunidadeId, int itemId, OportunidadeItemUpdateRequest itemRequest)
     {
+        
+        await using var transaction = await _context.Database.BeginTransactionAsync();
         var oportunidade = await _context.Oportunidades.FirstOrDefaultAsync(o => o.Id == oportunidadeId);
 
         if (oportunidade == null)
@@ -141,6 +145,7 @@ public class OportunidadeItemService
                 "Não é possível alterar os itens de uma oportunidade encerrada."
             );
         }
+        
 
         var item = await _context.OportunidadeItens.Include(i => i.ProdutoServico).FirstOrDefaultAsync(i => i.Id == itemId && i.OportunidadeId == oportunidadeId);
 
@@ -155,6 +160,10 @@ public class OportunidadeItemService
 
         await AtualizarValorOportunidade(oportunidadeId);
 
+        await _context.SaveChangesAsync();
+
+        await transaction.CommitAsync();
+
         return MapearParaResponse(
             item,
             item.ProdutoServico.Nome
@@ -162,8 +171,10 @@ public class OportunidadeItemService
     }
     public async Task<bool> DeleteItem(int oportunidadeId, int itemId)
     {
+        await using var transaction = await _context.Database.BeginTransactionAsync();
         var oportunidade = await _context.Oportunidades.FirstOrDefaultAsync(o => o.Id == oportunidadeId);
 
+        try{
         if (oportunidade == null)
         {
             throw new BusinessException(
@@ -189,11 +200,19 @@ public class OportunidadeItemService
 
         _context.OportunidadeItens.Remove(item);
 
-        await _context.SaveChangesAsync();
-
         await AtualizarValorOportunidade(oportunidadeId);
 
+        await _context.SaveChangesAsync();
+
+        await transaction.CommitAsync();
+
         return true;
+        }
+        catch
+        {
+            await transaction.RollbackAsync();
+            throw;
+        }
     }
     private async Task AtualizarValorOportunidade(int oportunidadeId)
     {
